@@ -15,11 +15,11 @@ class Nodo:
 class ListaEnlazada:
     def __init__(self):
         self.primero = None
-        self.id = 0
+        self.id = -1
 
     def insertar(self, dato):
         if self.primero is None:
-            self.id += self.id
+            self.id += 1
             self.primero = Nodo(dato=dato, id=str(self.id))
             return
         actual = self.primero
@@ -37,7 +37,7 @@ class NodoEncabezado:
 
 
 class NodoInterno:
-    def __init__(self, fila=None, columna=None, estado=None):
+    def __init__(self, fila=None, columna=None, estado=None, contador = 1):
         self.fila = fila
         self.columna = columna
         self.estado = estado
@@ -45,7 +45,10 @@ class NodoInterno:
         self.abajo = None
         self.izquierda = None
         self.derecha = None
+        self.contador = contador
 
+    def sumarContador(self):
+        self.contador += 1
 
 class ListaEncabezado:
     def __init__(self, tipo=None):
@@ -91,6 +94,7 @@ class ListaEncabezado:
 
 
 
+
 class MatrizDispersa:
     def __init__(self):
         self.filas = ListaEncabezado(tipo='f')
@@ -116,7 +120,10 @@ class MatrizDispersa:
             else:
                 aux: NodoInterno = encabezadoFila.acceso
                 while aux != None:
-                    if int(nodoInterno.columna) < int(aux.columna):
+                    if int(nodoInterno.columna) == int(aux.columna):
+                        aux.sumarContador()
+                        break
+                    elif int(nodoInterno.columna) < int(aux.columna):
                         nodoInterno.derecha = aux
                         nodoInterno.izquierda = aux.izquierda
                         aux.izquierda.derecha = nodoInterno
@@ -140,7 +147,9 @@ class MatrizDispersa:
             else:
                 aux2: NodoInterno = encabezadoColumna.acceso
                 while aux2 != None:
-                    if int(nodoInterno.fila) < int(aux2.fila):
+                    if int(nodoInterno.fila) == int(aux2.fila):
+                        break
+                    elif int(nodoInterno.fila) < int(aux2.fila):
                         nodoInterno.abajo = aux2
                         nodoInterno.arriba = aux2.arriba
                         aux2.arriba.abajo = nodoInterno
@@ -153,6 +162,45 @@ class MatrizDispersa:
                             break
                         else:
                             aux2 = aux2.abajo
+
+    def getCelda(self, fila, columna):
+        encabezadoFila = self.filas.getEncabezado(str(fila))
+        if encabezadoFila is None:
+            return
+        else:
+            celda = encabezadoFila.acceso
+            while celda is not None:
+                if celda.columna == str(columna):
+                    return celda
+                celda = celda.derecha
+            return
+
+    def getCeldas(self): # Devuelve una lista enlazada de todas las celdas existentes en la matriz
+        listaCeldas = ListaEnlazada()
+        encabezadoFila = self.filas.primero
+        if encabezadoFila is None:
+            return
+        while encabezadoFila is not None:
+            celda = encabezadoFila.acceso
+            while celda is not None:
+                listaCeldas.insertar(celda)
+                celda = celda.derecha
+            encabezadoFila = encabezadoFila.siguiente
+        return listaCeldas
+
+    def getCeldasContagiadas(self): # Devuelve una lista enlazada de todas las celdas que fueron contagiadas según la regla 2
+        listaCeldas = ListaEnlazada()
+        encabezadoFila = self.filas.primero
+        if encabezadoFila is None:
+            return
+        while encabezadoFila is not None:
+            celda = encabezadoFila.acceso
+            while celda is not None:
+                if celda.contador == 3:
+                    listaCeldas.insertar(celda)
+                celda = celda.derecha
+            encabezadoFila = encabezadoFila.siguiente
+        return listaCeldas
 
 
     def print(self):
