@@ -37,7 +37,7 @@ def exportarXML(listaPacientes):
         nodo = nodo.siguiente
     b_xml = ET.tostring(datos)
     hora = datetime.now()
-    rutaXML = 'XML/'+ str(hora.hour) + '.' + str(hora.minute) + '.' +str(hora.second)+ '  ' + str(hora.day) + '-' + str(hora.month)
+    rutaXML = str(hora.hour) + '.' + str(hora.minute) + '.' +str(hora.second)+ '  ' + str(hora.day) + '-' + str(hora.month)
     with open(rutaXML,"wb") as archivo:
         archivo.write(b_xml)
 
