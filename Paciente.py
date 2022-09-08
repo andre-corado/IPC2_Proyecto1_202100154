@@ -7,17 +7,18 @@ class Paciente:
         self.edad = edad
         self.periodos = periodos
         self.m = m
+        self.n = None
+        self.n1 = None
         self.primeraRejilla = primeraRejilla
         self.rejillas = ListaEnlazada()
         self.rejillas.insertar(primeraRejilla)
-        self.resultado = None
+        self.diagnostico = 'leve'
 
     def agregarRejilla(self, rejilla):
         self.rejillas.insertar(rejilla)
 
     def analizarCaso(self, m, periodos):
-        print('________________________________________________\n\n\t\tANÁLISIS DE CASO: ', self.nombre,'\n\n\tPrimera Rejilla:\n')
-        self.printRejilla(self.primeraRejilla)
+        print('________________________________________________\n\n\t\tANÁLISIS DE CASO: ', self.nombre+'\n')
         rejilla = self.primeraRejilla
 
         for periodo in range(1, periodos + 1):
@@ -95,10 +96,52 @@ class Paciente:
             while nodoCeldaContagiada is not None:
                 nuevaRejilla.insertar(NodoInterno(nodoCeldaContagiada.dato.fila, nodoCeldaContagiada.dato.columna))
                 nodoCeldaContagiada = nodoCeldaContagiada.siguiente
-
-            print('________________________________________________\n\n\tRejilla Periodo: '+ str(periodo)+'\n')
-            nuevaRejilla.print()
+            self.agregarRejilla(nuevaRejilla)
             rejilla = nuevaRejilla
+        self.diagnosticar()
+
+
+    def diagnosticar(self):
+        diagnosticado = False
+        nodo = self.rejillas.primero.siguiente
+        # Por cada rejilla
+        while nodo is not None:
+            rejilla = nodo.dato
+            if rejilla.equals(self.primeraRejilla):
+                self.n = nodo.id
+                if self.n == 1:
+                    self.diagnostico = str('mortal')
+                elif self.n > 1:
+                    self.diagnostico = str('grave')
+                diagnosticado = True
+                break
+            nodo = nodo.siguiente
+
+        if not diagnosticado:
+            # Todas las rejillas desde la última hacia la primera
+            nodo = self.rejillas.primero.siguiente
+            while nodo is not None:
+                rejilla = nodo.dato
+                # Todas las rejillas desde el periodo 1 hasta el actual
+                nodoAux = self.rejillas.ultimo
+                while nodoAux is not None:
+                    if nodoAux.id == nodo.id:
+                        break
+                    rejillaAux = nodoAux.dato
+                    if rejilla.equals(rejillaAux):
+                        self.n = nodo.id
+                        self.n1 = (nodoAux.id - nodo.id)
+                        if self.n1 == 1:
+                            self.diagnostico = str('mortal')
+                        elif self.n1 > 1:
+                            self.diagnostico = str('grave')
+                    nodoAux = nodoAux.anterior
+                nodo = nodo.siguiente
+
+        print('El diagnóstico del paciente es un caso ' + self.diagnostico + '\nCon un periodo de: ' + str(self.n))
+        if self.n1 is not None:
+            print('Se repite a los ' + str(self.n1) + ' periodos.')
+
 
     def printRejilla(self, rejilla):
         encabezadoFila = rejilla.filas.primero

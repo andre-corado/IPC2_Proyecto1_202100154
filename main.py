@@ -39,6 +39,7 @@ if __name__ == '__main__':
         menu = input()
         if menu == '1':
             ruta = AbrirFileExplorer()
+            # ruta = 'C:/Users/SergioLima/OneDrive - Facultad de Ingeniería de la Universidad de San Carlos de Guatemala/Escritorio/Coding/IPC2/IPC2_Proyecto1_202100154/prueba1.xml'
             print('\nLa ruta elegida es:\t', ruta)
             print()
             print('Ingrese Y o y para confirmar la ruta.\n')

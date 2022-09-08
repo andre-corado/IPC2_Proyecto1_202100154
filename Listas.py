@@ -1,31 +1,30 @@
-class Celda:
-    def __init__(self, fila, columna, estado):
-        self.fila = fila
-        self.columna = columna
-        self.estado = estado
-
-
 class Nodo:
-    def __init__(self, dato=None, siguiente=None, id=None):
+    def __init__(self, dato=None, siguiente=None, id=None, anterior = None):
         self.id = id
         self.dato = dato
         self.siguiente = siguiente
+        self.anterior = anterior
 
 
 class ListaEnlazada:
     def __init__(self):
         self.primero = None
-        self.id = -1
+        self.ultimo = None
+        self.id = 0
 
     def insertar(self, dato):
         if self.primero is None:
-            self.id += 1
-            self.primero = Nodo(dato=dato, id=str(self.id))
+            self.primero = Nodo(dato=dato, id=self.id)
+            self.ultimo = self.primero
             return
         actual = self.primero
         while actual.siguiente:
             actual = actual.siguiente
-        actual.siguiente = Nodo(dato=dato)
+        self.id += 1
+        actual.siguiente = Nodo(dato=dato, id=self.id)
+        actual.siguiente.anterior = actual
+        self.ultimo = actual.siguiente
+
 
 
 class NodoEncabezado:
@@ -55,7 +54,6 @@ class ListaEncabezado:
         self.tipo = tipo
         self.primero = NodoEncabezado = None
         self.ultimo = NodoEncabezado = None
-        self.size = 0
 
     def insertarEncabezado(self, nuevoEncabezado):
         if self.primero == None:
@@ -201,6 +199,17 @@ class MatrizDispersa:
                 celda = celda.derecha
             encabezadoFila = encabezadoFila.siguiente
         return listaCeldas
+
+    def equals(self, segundaRejilla):
+        sonIguales = True
+        listaCeldas = self.getCeldas()
+        nodoCelda = listaCeldas.primero
+        while nodoCelda is not None:
+            celda = nodoCelda.dato
+            if segundaRejilla.getCelda(celda.fila, celda.columna) is None:
+                return False
+            nodoCelda = nodoCelda.siguiente
+        return sonIguales
 
 
     def print(self):
