@@ -1,5 +1,5 @@
 from Listas import *
-
+import os
 
 class Paciente:
     def __init__(self, nombre, edad, periodos, m, primeraRejilla):
@@ -97,6 +97,8 @@ class Paciente:
                 nuevaRejilla.insertar(NodoInterno(nodoCeldaContagiada.dato.fila, nodoCeldaContagiada.dato.columna))
                 nodoCeldaContagiada = nodoCeldaContagiada.siguiente
             self.agregarRejilla(nuevaRejilla)
+            print('\n------------------------------------------------------\n\t\tPeriodo ' + str(periodo))
+            nuevaRejilla.print()
             rejilla = nuevaRejilla
         self.diagnosticar()
 
@@ -137,10 +139,46 @@ class Paciente:
                             self.diagnostico = str('grave')
                     nodoAux = nodoAux.anterior
                 nodo = nodo.siguiente
-
-        print('El diagnóstico del paciente es un caso ' + self.diagnostico + '\nCon un periodo de: ' + str(self.n))
+        print('----------------------------------------------------------\nEl diagnóstico del paciente es un caso ' + self.diagnostico + '\nCon un periodo de: ' + str(self.n))
         if self.n1 is not None:
             print('Se repite a los ' + str(self.n1) + ' periodos.')
+
+    def hacerPDF(self):
+        i = 1
+        graphviz = 'digraph Patron{ \n node[shape =box, width = 1, height = 1]; \n edge[style = invis]; \n ranksep = 0 \n subgraph Cluster_A{ \n label = "' + '| Paciente: ' + self.nombre + ' | Edad: ' + str(
+            self.edad) + ' | Periodo: ' + str(
+            self.periodos) + ' |' + ' "   \n fontcolor ="black" \n fontsize = 41 \n bgcolor ="#F1DFB2" \n'
+        nodo = None
+        while nodo is not None:
+            if nodo.getEstado() == 1:
+                graphviz += 'node{}[fontcolor = "#59A94A" fillcolor = "#59A94A" style = filled]; \n'.format(i)
+                graphviz += 'node{}[fontcolor = "#EEAEBA" fillcolor = "#EEAEBA" style = filled]; \n'.format(i)
+            nodo = nodo.siguiente
+            i += 1
+        i = 1
+        j = 2
+
+        for h in range((int(self.m) * int(self.m)) - 1):
+            graphviz += 'node{}->node{} \n'.format(i, j)
+            i += 1
+            j += 1
+
+        i = 1
+        for h in range(int(self.m)):
+            graphviz += '{ rank = same'
+
+            for g in range(int(self.m)):
+                graphviz += ';node{}'.format(i)
+                i += 1
+            graphviz += '} \n'
+
+        graphviz += '} \n }'
+
+        documento = 'grafica' + self.nombre + '.txt'
+        with open(documento, 'w') as grafica:
+            grafica.write(graphviz)
+        pdf = 'grafica' + str(self.periodos) + '.jpg'
+        os.system("dot.exe -Tjpg " + documento + " -o " + pdf)
 
 
     def printRejilla(self, rejilla):

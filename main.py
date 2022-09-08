@@ -3,12 +3,43 @@ from Paciente import Paciente
 from tkinter import filedialog
 from Listas import *
 import os
+from datetime import datetime
 
 
 def AbrirFileExplorer():
     ruta = filedialog.askopenfilename(initialdir="C:/Users/SergioLima/Downloads", title="Elige un archivo XML",
                                       filetypes=(("XML files", "*.xml*"),("All files", "*.xml*")))
     return ruta
+
+def exportarXML(listaPacientes):
+    datos = ET.Element('pacientes')
+    nodo = listaPacientes.primero
+    while nodo is not None:
+        paciente = nodo.dato
+        elemPaciente = ET.SubElement(datos, 'paciente')
+        elemDP = ET.SubElement(elemPaciente, 'datospersonales')
+        elemNombre = ET.SubElement(elemDP, 'nombre')
+        elemNombre.text = paciente.nombre
+        elemEdad = ET.SubElement(elemDP, 'edad')
+        elemEdad.text = paciente.edad
+        elemPeriodos = ET.SubElement(elemPaciente, 'periodos')
+        elemPeriodos.text = str(paciente.periodos)
+        elemM = ET.SubElement(elemPaciente, 'm')
+        elemM.text = str(paciente.m)
+        elemResultado = ET.SubElement(elemPaciente, 'resultado')
+        elemResultado.text = paciente.diagnostico
+        if paciente.n is not None:
+            elemN = ET.SubElement(elemPaciente, 'n')
+            elemN.text = str(paciente.n)
+            if paciente.n1 is not None:
+                elemN1 = ET.SubElement(elemPaciente, 'n1')
+                elemN1.text = str(paciente.n1)
+        nodo = nodo.siguiente
+    b_xml = ET.tostring(datos)
+    hora = datetime.now()
+    rutaXML = 'XML/'+ str(hora.hour) + '.' + str(hora.minute) + '.' +str(hora.second)+ '  ' + str(hora.day) + '-' + str(hora.month)
+    with open(rutaXML,"wb") as archivo:
+        archivo.write(b_xml)
 
 def lectura(ruta, ListaPacientes):
     tree = ET.parse(ruta)
@@ -51,6 +82,7 @@ if __name__ == '__main__':
                 while nodo is not None:
                     nodo.dato.analizarCaso(int(nodo.dato.m), int(nodo.dato.periodos))
                     nodo = nodo.siguiente
+                exportarXML(listaPacientes)
                 input()
             else:
                 print('Instrucción no válida')
